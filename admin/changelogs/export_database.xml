@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:n0="http://www.oracle.com/xml/ns/dbchangelog-ext"
+
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet author="vanitha" id="export_database" failOnError="true">
+      <sqlFile dbms="oracle"
+               endDelimiter="/"
+               path="/home/opc/git/admin/scripts/export_database.sql"
+        stripComments="false"/>
+  </changeSet>
+
+
+</databaseChangeLog>
