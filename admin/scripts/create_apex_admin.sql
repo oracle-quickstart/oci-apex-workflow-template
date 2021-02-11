@@ -1,8 +1,8 @@
 declare
-   l_user VARCHAR2(30) := 'apexadmin';
-   l_password VARCHAR2(30) := 'WELcome##12345';
-   l_oci_username VARCHAR2(100) := 'vanitha.subramanyam@oracle.com';
-   l_oci_authtoken VARCHAR2(100) := 'Xyz4AI.n8T}RxH8gfZw{';
+   l_user VARCHAR2(30) := '&1';
+   l_password VARCHAR2(30) := '&2';
+   l_oci_username VARCHAR2(100) := '&3';
+   l_oci_authtoken VARCHAR2(100) := '&4';
    l_credential_name VARCHAR2(30) := 'DEF_CRED_NAME';
 begin
 		execute immediate 'create user '||l_user ||' identified by '||l_password|| ' default tablespace DATA quota unlimited on DATA';
@@ -52,3 +52,4 @@ begin
           null;
     END;
 end;
+/

@@ -1,7 +1,7 @@
 declare
-   l_workspace_name VARCHAR2(30) := 'WS_WORKSHOP';
+   l_workspace_name VARCHAR2(30) := '&1';
    l_workspace_id   NUMBER;
-   l_schema_name    VARCHAR2(30) := 'WORKSHOP';
+   l_schema_name    VARCHAR2(30) := '&2';
    l_app_alias    VARCHAR2(30) := 'OPP_TRACKER_QA';
 
 begin
@@ -16,3 +16,4 @@ begin
     apex_application_install.set_schema( l_schema_name);
     apex_application_install.set_application_alias( l_app_alias);
 end;
+/

@@ -8,7 +8,7 @@
 
 ### ***Prerequisites***
 
-1. Download latest JAVA and JDK library from ![here](https://www.oracle.com/java/technologies/javase-downloads.html)
+1. Download latest JAVA and JDK library from [here](https://www.oracle.com/java/technologies/javase-downloads.html)
 
 ```
 <copy>
@@ -19,7 +19,7 @@
 </copy>  
 ```
 
-2. Install SQLCL in your local desktop or in OCI Compute Instance. You can download from ![here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
+2. Install SQLCL in your local desktop or in OCI Compute Instance. You can download from [here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
 
 ```
 <copy>
@@ -37,6 +37,41 @@ alias sql="${HOME}/sqlcl/bin/sql"
 1. Setup Oracle Autonomous Database or APEX Development service from OCI Console.
 
 2. Download Wallet from OCI cloud console into Local Desktop or Compute Instance
+
+### **STEP 0**: Create dev.env file
+
+You need an env file with the variables to use the MAKEFILE properly
+
+```
+# Password need to include 1 uppercase ,1 lowercase, 1 digit, 1 special
+# and needs to start with a letter, be under 30 chars.
+
+# wallet path (relative to root of the repo)
+WALLET_PATH=wallet_dev
+
+# DB admin
+DB_NAME=
+DB_SERVICE=${DB_NAME}_tp
+DB_ADMIN_USER=admin
+DB_ADMIN_PWD=
+
+# APEX Admin User
+APEX_ADMIN_USER=apexadmin
+APEX_ADMIN_PWD=
+APEX_ADMIN_EMAIL=
+# token in quotes as their may be special chars
+APEX_ADMIN_TOKEN=""
+
+# Schema
+SCHEMA=
+SCHEMA_ADMIN_PWD=
+
+# Workspace
+WORKSPACE_ADMIN=
+WORKSPACE_ADMIN_PWD=
+WORKSPACE_ADMIN_EMAIL=
+WORKSPACE_NAME=
+```
 
 ### **STEP 1**: **Create APEX Admin User**:
 
