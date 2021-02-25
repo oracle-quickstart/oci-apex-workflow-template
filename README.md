@@ -32,13 +32,71 @@ alias sql="${HOME}/sqlcl/bin/sql"
 
 ## **Development Environment Setup**:
 
-### ***Prerequisites***
+## **STEP 1:** Terraform setup
 
-1. Setup Oracle Autonomous Database or APEX Development service from OCI Console.
+1. Get in the `terraform` folder
 
-2. Download Wallet from OCI cloud console into Local Desktop or Compute Instance
+  ```bash
+  cd terraform
+  ```
 
-### **STEP 0**: Create dev.env file
+2. Create a `TF_VARS.sh` file
+
+  ```bash
+  cp TF_VARS.tpl TF_VARS.sh
+  ```
+
+3. Edit with your favorite editor and populate the following:
+
+  ```bash
+  export TF_VAR_user_ocid=ocid1.user.oc1..
+  export TF_VAR_fingerprint=dc:6e:1c:d4:76:...
+  export TF_VAR_private_key_path=~/.oci/oci_api_key.pem
+  export TF_VAR_tenancy_ocid=ocid1.tenancy.oc1..
+  export TF_VAR_region=us-ashburn-1
+  ```
+
+4. Create a `terraform.tfvars` file from template
+
+  ```bash
+  cp terraform.tfvars.template terraform.tfvars
+  ```
+
+5. Populate the required variables
+
+  ```
+  region="us-ashburn-1"
+  compartment_id="ocid1.compartment.oc1.."
+  autonomous_database_cpu_core_count=1
+  autonomous_database_db_name="apex1"
+  autonomous_database_display_name="APEX_DB"
+  autonomous_database_is_free_tier=true
+  ```
+
+## ** STEP 2:** Deploy the Autonomous Database
+
+1. Init the modules
+
+  ```bash
+  terraform init
+  ```
+
+2. Run the plan
+
+  ```bash
+  terraform plan
+  ```
+
+3. If all looks good, apply the plan
+
+  ```bash
+  terraform apply
+  ```
+
+  type `yes` at the prompt to confirm 
+
+
+## **STEP 3:**: Create `dev.env` file
 
 You need an env file with the variables to use the MAKEFILE properly
 
@@ -46,8 +104,10 @@ You need an env file with the variables to use the MAKEFILE properly
 # Password need to include 1 uppercase ,1 lowercase, 1 digit, 1 special
 # and needs to start with a letter, be under 30 chars.
 
-# wallet path (relative to root of the repo)
-WALLET_PATH=wallet_dev
+# wallet file name
+ENV_NAME=$(echo ${BASH_SOURCE[0]} | awk -F"." '{print $1}')
+WALLET_FILE=${ENV_NAME}-wallet.zip
+DB_OCID=<FROM_TERRAFORM_OUTPUT>
 
 # DB admin
 DB_NAME=
@@ -59,59 +119,143 @@ DB_ADMIN_PWD=
 APEX_ADMIN_USER=apexadmin
 APEX_ADMIN_PWD=
 APEX_ADMIN_EMAIL=
-# token in quotes as their may be special chars
 APEX_ADMIN_TOKEN=""
 
 # Schema
-SCHEMA=
+SCHEMA=MYSCHEMA
 SCHEMA_ADMIN_PWD=
 
 # Workspace
-WORKSPACE_ADMIN=
+WORKSPACE_ADMIN=WS_ADMIN
 WORKSPACE_ADMIN_PWD=
 WORKSPACE_ADMIN_EMAIL=
-WORKSPACE_NAME=
+WORKSPACE_NAME=MYWORKSPACE
 ```
 
-### **STEP 1**: **Create APEX Admin User**:
+## **STEP 4:** The makefile
 
-Oracle Autonomous Database has `admin` user by default which has all the special privileges to run as a administrator ,  for the purpose of APEX workspace provisioning and management we will be creating `apexadmin` user. Connect as `admin` user to create `apexadmin` user
+1. The makefile in this repository simplifies a lot of the tasks to be performed. Try 
 
+  ```bash
+  make help
+  ```
+
+  For the full list of functions:
+
+  ```bash
+  help                           This help.
+  install-deps                   Install required dependencies
+  wallet                         Get the Database wallet
+  sql                            SQLcl shell as APEX ADMIN user
+  create-apex-admin              Create the APEX admin user
+  delete-apex-admin              Delete the APEX admin user
+  create-cloud-creds             Create default cloud credential for the APEX ADMIN user to use datapump to Object Storage 
+  create-schema                  Create schema
+  delete-schema                  Delete schema
+  create-ws                      Create schema, workspace, add schema to workspace and create workspace admin user
+  delete-ws                      Delete workspace and its users
+  export-app                     Export the Apex App. Specify ID=<app_id>
+  import-app                     Import the Apex App. Specify ID=<app_id>
+  changelog                      Generate a new Change Log for the schema
+  update-schema                  Apply the Change Log to the schema
+  snapshot                       Create a new change Log, and export the app. Specify ID=<app_id>
+  update                         Apply the Change Log to the schema and import the app. Specify ID=<app_id> NEWID=<new_app_id>
+  ```
+
+## **STEP 5:** Create the `dev` environment
+
+Oracle Autonomous Database has `admin` user by default which has all the special privileges to run as a administrator ,  for the purpose of APEX workspace provisioning and management we will be creating `apexadmin` user. 
+
+1. First we need to get the wallet for the database in order to connect:
+
+  ```bash
+  make wallet
+  ```
+
+2. Create the APEX admin user
+
+    ```bash
+    make create-apex-admin
     ```
-    <copy>
-    $ sql /nolog
-    SQL>  set cloudconfig  <wallet downloaded directory>/<wallet zip file>
-    SQL> conn admin/<password>@<service name>
-    SQL> lb update -changelog <admin directory>/changelog_admin.xml
-    </copy>
-    ```
+
+3. Create a workspace (and a schema)
+
+  ```bash
+  make create-ws
+  ```
+
+## **STEP 6:** Create other environments
+
+1. The `make` commands above take a variable *`ENV`* that define what `.env` file to use to create the environment. To create another environment, duplicate the `dev.env` file and name it `prod.env` for example.
+
+  *If you use the same target database, you MUST change the name of the SCHEMA and the WORKSPACE in the new `.env` file*
+
+2. Get the wallet for the DB for this other environment:
+
+  ```bash
+  make wallet ENV=prod
+  ```
+
+  (prod being the basename of the .env file to use: `prod.env`)
+
+3. Then you can create the schema and workspace for the second environment using:
+
+  ```bash
+  make create-ws ENV=prod
+  ```
+
+  *If you use a separate database, it is recommended to use the same SCHEMA and WORKSPACE names, but change the passwords*
+
+  *You also need to create the APEX admin user in the new database* with:
+
+  ```bash
+  make create-apex-admin ENV=prod
+  ```
+
+## **STEP 7:** Start developping
+
+1. You can create a new application in the APEX interface, or use a template application from the gallery
+
+## **STEP 8:** Take a snapshot of the state of the app
+
+1. We use the LiquiBase tool to create snapshots of the schema, and the apex export tool to export the app itself.
+
+2. Take a snapshot of the app state with:
+
+  ```bash
+  make snapshot ID=<app_id>
+  ```
+
+  This will create a changelog of the schema and export the app.
+
+  You can run the operations separately with:
+
+  ```bash
+  make changelog
+  ```
+
+  and
+
+  ```bash
+  make export-app ID=<app_id>
+  ```
+
+## **STEP 9:** Deploy the app to another environment
+
+1. With the app export and the schema changelog, we can reproduce the full application to another environment with:
+
+  ```bash
+  make update ID=<original_app_id> NEWID=<new_app_id> ENV=prod
+  ```
+
+  Note that APEX APP IDs must be *unique* within a single database (regardless of SCHEMA or WORKSPACE), so if you created the `prod` environment in the same database as the `dev` environment, the *`new_app_id`* MUST be different from the *`original_app_id`*. We recommend using a fixed offset (like 1000)
+
+  If you are deploying on a separate database, make the *`new_app_id`* the same as the *`original_app_id`* for consistentcy across environments.
 
 
 
-### **STEP 2**: **Create APEX Workspace** and **Workspace administrator**:
 
-Create `workshop` schema , `WS_WORKSHOP` APEX workspace and `WORKSP_ADMIN` workspace administrator user
 
-```
-<copy>
-$ sql /nolog
-SQL> set cloudconfig  <wallet downloaded directory>/<wallet zip file>
-SQL> conn apexdmin/<password>@<service name>
-SQL> lb update -changelog <admin directory>/changelog_workshop.xml
-</copy>
-```
-
-### **STEP 3**: Download  **Opportunity Tracker** productivity application from **Application Gallery** under **Producity Apps**
-
-1. Login as `worksp_admin` created in Step 2.
-
-2. Click on App Gallery and click on Productivity Apps and locate Opportunity track and click to install it
-
-3. Once installed unlock the application so that you can modify it
-
-4. When the Opportunity Tracker application is installed , the associated database tables/views/packages and all associated objects are also installed under `WORKSHOP` schema.
-
-5. Run the application with the `worksp_admin` user and the same workspace password to make sure it is working.
 
 ## **STEP 4**: Prepare for moving to QA and Production
 
