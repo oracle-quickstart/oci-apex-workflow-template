@@ -73,7 +73,7 @@ alias sql="${HOME}/sqlcl/bin/sql"
   autonomous_database_is_free_tier=true
   ```
 
-## ** STEP 2:** Deploy the Autonomous Database
+## **STEP 2:** Deploy the Autonomous Database
 
 1. Init the modules
 
@@ -214,7 +214,12 @@ Oracle Autonomous Database has `admin` user by default which has all the special
 
 ## **STEP 7:** Start developping
 
-1. You can create a new application in the APEX interface, or use a template application from the gallery
+1. You can create a new application in the APEX interface, or use a template application from the gallery.
+
+2. If you used an app from the gallery, make sure to UNLOCK it before the next steps:
+
+  ![alt text](./images/unlock.png)
+
 
 ## **STEP 8:** Take a snapshot of the state of the app
 
