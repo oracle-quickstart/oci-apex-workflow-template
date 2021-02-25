@@ -11,18 +11,17 @@ declare
    l_body CLOB;
 
 begin
-    execute immediate 'create user '||l_schema ||' identified by '||l_schema_password|| ' default tablespace DATA quota unlimited on DATA';
-    execute immediate 'grant connect to '||l_schema;
-    execute immediate 'grant resource to '||l_schema;
-    execute immediate 'grant dwrole to '||l_schema;
-    execute immediate 'grant RESOURCE to '||l_schema;
-    execute immediate 'grant create session to '||l_schema;
+    execute immediate 'create user ' || l_schema || ' identified by ' || l_schema_password || ' default tablespace DATA quota unlimited on DATA';
+    execute immediate 'grant connect to ' || l_schema;
+    execute immediate 'grant resource to ' || l_schema;
+    execute immediate 'grant dwrole to ' || l_schema;
+    execute immediate 'grant create session to ' || l_schema;
 
     begin
         for c1 in (select privilege
                    from sys.dba_sys_privs
                    where grantee = 'APEX_GRANTS_FOR_NEW_USERS_ROLE') loop
-                execute immediate 'grant '||c1.privilege||' to '||l_schema ;
+                execute immediate 'grant ' || c1.privilege || ' to ' || l_schema ;
         end loop;
     end;
     apex_instance_admin.add_workspace(
@@ -37,7 +36,8 @@ begin
     apex_util.set_workspace(
         p_workspace      => l_workspace_base);
 
-    apex_util.set_security_group_id( apex_util.find_security_group_id( p_workspace => l_workspace_base));
+    apex_util.set_security_group_id( 
+        apex_util.find_security_group_id(p_workspace => l_workspace_base));
     l_group_id := APEX_UTIL.GET_GROUP_ID(l_group_name);
 
     if l_group_id IS NULL THEN
@@ -49,14 +49,15 @@ begin
                 );
     end if;
     -- for ATP/APEX Service we need to create database user before creating APEX users
-        execute immediate 'create user '||l_workspace_admin||' identified by "'||l_workspace_admin_password||
-    '" default tablespace DATA quota unlimited on DATA';
+    execute immediate 'create user '|| l_workspace_admin ||
+                    ' identified by "'|| l_workspace_admin_password ||
+                    '" default tablespace DATA quota unlimited on DATA';
 
     --grant all the privileges that a db user would get if provisioned by APEX
     for c1 in (select privilege
             from sys.dba_sys_privs
         where grantee = 'APEX_GRANTS_FOR_NEW_USERS_ROLE' ) loop
-        execute immediate 'grant '||c1.privilege||' to '||l_workspace_admin;
+        execute immediate 'grant ' || c1.privilege || ' to ' || l_workspace_admin;
     end loop;
 
 

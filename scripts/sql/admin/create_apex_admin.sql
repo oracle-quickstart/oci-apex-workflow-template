@@ -1,9 +1,6 @@
 declare
    l_user VARCHAR2(30) := '&1';
    l_password VARCHAR2(30) := '&2';
-   l_oci_username VARCHAR2(100) := '&3';
-   l_oci_authtoken VARCHAR2(100) := '&4';
-   l_credential_name VARCHAR2(30) := 'DEF_CRED_NAME';
 begin
 		execute immediate 'create user '||l_user ||' identified by '||l_password|| ' default tablespace DATA quota unlimited on DATA';
 		execute immediate 'grant connect to '||l_user;
@@ -40,16 +37,5 @@ begin
 		            execute immediate 'grant '||c1.privilege||' to '||l_user|| ' with admin option';
 		    end loop;
     end;
-    -- Define credential to store the backups in OCI object storage or to use DBMS CLOUD API
-    begin
-        dbms_cloud.create_credential(
-            credential_name => l_credential_name
-            , username => l_oci_username
-            , password => l_oci_authtoken
-          );
-    EXCEPTION
-        when others then
-          null;
-    END;
 end;
 /

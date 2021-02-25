@@ -1,0 +1,6 @@
+region="us-ashburn-1"
+compartment_id="ocid1.compartment.oc1.."
+autonomous_database_cpu_core_count=1
+autonomous_database_db_name="apex1"
+autonomous_database_display_name="APEX_DB"
+autonomous_database_is_free_tier=true
