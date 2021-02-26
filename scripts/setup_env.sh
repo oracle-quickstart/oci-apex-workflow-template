@@ -3,8 +3,7 @@
 PLATFORM=$(uname)
 
 which sql \
-|| (curl -sLO -H 'Cookie: oraclelicense=accept-securebackup-cookie' -O https://download.oracle.com/otn/java/sqldeveloper/sqlcl-20.4.1.351.1718.zip \
-    && unzip sqlcl-20.4.1.351.1718.zip -d \
+|| unzip sqlcl-*.zip -d \
     && export PATH=$PATH:./sqlcl/bin/)
 
 TERRAFORM_VERSION=0.14.6
