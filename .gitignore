@@ -3,7 +3,7 @@ terraform/TF_VARS.sh
 terraform/*.tfvars
 terraform/*.tfstate
 terraform/*.tfstate.backup
-terraform/(.tfstate.lock.info
+terraform/*.tfstate.lock.info
 sqlcl
 *-wallet.zip
 *.env
