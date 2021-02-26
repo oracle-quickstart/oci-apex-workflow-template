@@ -1,3 +1,6 @@
+-- Copyright © 2021, Oracle and/or its affiliates. 
+-- All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 declare
    l_user VARCHAR2(30) := '&1';
    l_password VARCHAR2(30) := '&2';

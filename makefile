@@ -1,3 +1,6 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 # Default environment
 ENV := dev
 ENV_FILE := $(ENV).env
@@ -141,3 +144,7 @@ update: import-app update-schema ## Apply the Change Log & import the app. Speci
 init: clean-wallets tf-apply ## Deploy the database(s) and setup all the defined environments
 	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-apex-admin ENV={}
 	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-ws ENV={}
+
+.PHONY: test
+test: ## Test (WIP)
+	echo "running tests"

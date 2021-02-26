@@ -1,3 +1,6 @@
+-- Copyright © 2021, Oracle and/or its affiliates. 
+-- All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 DECLARE
    dp_id NUMBER; -- job id
    l_obj_storage_url VARCHAR2(1000) := 'https://objectstorage.us-ashburn-1.oraclecloud.com/p/Tt1P2LSq1HxuE6Jf5Q1cIxyHCG7uX9fSI1Vh_lq6zFXdRyCy8ep0lko7jL9SGgMT/n/ocisateam/b/datapump';

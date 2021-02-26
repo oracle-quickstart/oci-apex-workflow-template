@@ -6,20 +6,17 @@
 
 ### ***Prerequisites***
 
-1. Download latest JAVA and JDK library from [here](https://www.oracle.com/java/technologies/javase-downloads.html)
+1. JDK: Download from [here](https://www.oracle.com/java/technologies/javase-downloads.html)
 
-```
-<copy>
-  mkdir ~/java
-  cd ~/java
-  tar -xf /tmp/<java zipped archive>
-  ln -s ./j* ./<jdk version>
-</copy>  
-```
+## **STEP 1:** Get the template and required downloads
+
+1. Use this repo as TEMPLATE
+
+  ![](./images/template.png)
 
 2. Download SQLcl from [here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
 
-3. Place the SQLcl download in the scripts folder
+3. Place the SQLcl download in the root folder
 
 4. run:
 
@@ -27,7 +24,7 @@
   ./script/setup_env.sh
   ```
 
-## **STEP 1:** Terraform setup
+## **STEP 2:** Terraform setup
 
 1. Get in the `terraform` folder
 
@@ -64,9 +61,13 @@
   compartment_id="ocid1.compartment.oc1.."
   ```
 
-  and edit the schema, workspace and user names as desired.
+  and edit the schema, workspace and user names as desired. The defaults look like:
 
-## **STEP 2:** Deploy
+  ```
+
+  ```
+
+## **STEP 3:** Deploy
 
 1. The whole stack and environments can be deployed and configured in one command:
 
@@ -77,7 +78,7 @@
   The terraform stacks generates environment files for each environment. The files are on the root folder, named *`<env_name>.env`* and contain the credentials for each user/schema/workspace
 
 
-## **STEP 3:** The makefile
+## **STEP 4:** Using the makefile
 
 1. The makefile in this repository simplifies a lot of the tasks to be performed. Try 
 
@@ -112,20 +113,31 @@
 
 2. Oracle Autonomous Database has `admin` user by default which has all the special privileges to run as a administrator ,  for the purpose of APEX workspace provisioning and management we will be creating `apexadmin` user. 
 
-## **STEP 4:** Start developping
+## **STEP 5:** Start developping
 
-1. You can create a new application in the APEX interface, or use a template application from the gallery.
+1. Login to the ATP database for dev: 
 
-2. If you used an app from the gallery, make sure to UNLOCK it before the next steps:
+  - Go to **Oracle Databases -> Autonomous Transaction Processing** in your compartment
+  - Click the database for dev (*APEX_DEV* if you used the default names)
+  - Click **Tools** tab and under **Oracle Application Express**, click then **Open APEX**
+  - Click **Workspace Sign-in**
 
-  ![alt text](./images/unlock.png)
+    ![](.images/ws_signin.png)
+
+  - Enter the credentials for the Workspace Admin user (*WS_ADMIN* if you used the default names) found in the *`dev.env`* file (WORKSPACE_ADMIN and WORKSPACE_ADMIN_PWD)
+
+2. You can create a new application in the APEX interface, or use a template application from the gallery.
+
+3. If you used an app from the gallery, make sure to UNLOCK it before the next steps:
+
+  ![](./images/unlock.png)
 
 
-## **STEP 5:** Take a snapshot of the state of the app
+## **STEP 6:** Take a snapshot of the state of the app
 
 1. We use the LiquiBase tool to create snapshots of the schema, and the apex export tool to export the app itself.
 
-2. Take a snapshot of the app state with:
+2. Make note of the APP ID in the APEX UI, and take a snapshot of the app state with:
 
   ```bash
   make snapshot ID=<app_id>
@@ -133,7 +145,7 @@
 
   This will create a changelog of the schema and export the app.
 
-  You can run the operations separately with:
+  You can run the 2 operations separately with:
 
   ```bash
   make changelog
@@ -145,20 +157,79 @@
   make export-app ID=<app_id>
   ```
 
-## **STEP 6:** Deploy the app to another environment
+## **STEP 7:** Deploy the app to another environment
 
 1. With the app export and the schema changelog, we can reproduce the full application to another environment with:
 
   ```bash
-  make update ID=<original_app_id> NEWID=<new_app_id> ENV=prod
+  make update ENV=prd ID=<original_app_id> NEWID=<new_app_id> 
   ```
 
-  Note that APEX APP IDs must be *unique* within a single database (regardless of SCHEMA or WORKSPACE), so if you created the `prod` environment in the same database as the `dev` environment, the *`new_app_id`* MUST be different from the *`original_app_id`*. We recommend using a fixed offset (like 1000)
+  Note that APEX APP IDs must be *unique* within a single database (regardless of SCHEMA or WORKSPACE), so if you created the `prd` environment in the same database as the `dev` environment, the *`new_app_id`* MUST be different from the *`original_app_id`*. We recommend using a fixed offset (like 1000)
 
-  If you are deploying on a separate database, make the *`new_app_id`* the same as the *`original_app_id`* for consistentcy across environments.
+  If you are deploying on a separate database, the *`new_app_id`* can be ommitted and it will default to the current APP ID, so if you used the default setup in terraform, you can do:
+
+  ```bash
+  make update ENV=prd ID=<original_app_id>
+  ```
+
+## **STEP 8:** Checking the deployment
+
+1. Login to the ATP database for prd: 
+
+  - Go to **Oracle Databases -> Autonomous Transaction Processing** in your compartment
+  - Click the database for dev (*APEX_PRD* if you used the default names)
+  - Click **Tools** tab and under **Oracle Application Express**, click then **Open APEX**
+  - Click **Workspace Sign-in**
+
+    ![](.images/ws_signin.png)
+
+  - Enter the credentials for the Workspace Admin user (*WS_ADMIN* if you used the default names) found in the *`prd.env`* file (WORKSPACE_ADMIN and WORKSPACE_ADMIN_PWD)
+
+2. You should find your application, and be able to run it.
+
+## **STEP 9:** Make some changes
+
+1. Before making any changes, checkin you current state into git:
+
+  ```bash
+  git add apps/
+  git add changelogs/
+  git commit -m"Initial state"
+  git push origin master
+  ```
+
+2. Back on the APEX_DEV database, make some changes:
+
+  For example, add a table, or add a column in an existing table, or modify a component of the application
+
+3. Create a new snapshot:
+
+  ```bash
+  make snapshot ID=<app_id>
+  ```
+
+4. Check your changes into git
+
+  ```bash
+  git add apps/
+  git add changelogs/
+  git commit -m"First state change"
+  git push origin master
+  ```
+
+5. Redeploy to prod
+
+  ```bash
+  make update ENV=prd ID=<app_id>
+  ```
+
+## **STEP 10:** Rolling back changes
 
 
-## **STEP 7:** Create other environments
+
+
+## **STEP 8:** Create other environments
 
 1. The `make` commands above take a variable *`ENV`* that define what `.env` file to use to create the environment. To create another environment, duplicate one of the `.env` file and rename it.
 

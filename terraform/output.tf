@@ -1,13 +1,12 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 locals {
     all_envs = tolist(flatten(var.databases.*.envs))
     # db_idx_map = merge([for db in var.databases: {for env in db.envs: env => index(var.databases, db) }])
     db_idx_map = flatten([for env in local.all_envs: index([for db in var.databases: contains(db.envs, env)], true)])
 
 }
-
-# output "test" {
-#     value = [local.all_envs, local.db_idx_map]
-# }
 
 resource "local_file" "env" {
     count = length(local.all_envs)

@@ -1,3 +1,6 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 # wallet file name
 ENV_NAME=$(echo $${BASH_SOURCE[0]} | awk -F"." '{print $1}')
 WALLET_FILE=$${ENV_NAME}-wallet.zip
