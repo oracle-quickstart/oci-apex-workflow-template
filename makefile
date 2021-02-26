@@ -26,11 +26,12 @@ sql: ## SQLcl shell as APEX ADMIN user
 
 .PHONY: wallet
 wallet: ## Get the Database wallet
-	. $(ENV_FILE); \
+	@ . $(ENV_FILE); \
 	export WALLET_PWD=`printf $$(xxd -l 14 -p /dev/urandom | tr 'acegikmoqsuwy' 'ACEGIKMOQSUWY')`; \
 	[[ ! -f $(ENV)-wallet.zip ]] && oci db autonomous-database generate-wallet --autonomous-database-id $${DB_OCID} --file $(ENV)-wallet.zip --password "$${WALLET_PWD}" || echo "Wallet exists"
 
 .PHONY: clean-wallets 
+clean-wallets: ## remove the wallets
 	rm *-wallet.zip
 
 .PHONY: tf-apply
@@ -90,13 +91,23 @@ delete-ws: wallet ## Delete workspace and its users
 
 .PHONY: export-app
 export-app: wallet ## Export the Apex App. Specify ID=<app_id>
+ifndef ID
+	$(error ID is not set)
+endif
 	. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
 	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/export_app.sql $(ID) EOF
 
 .PHONY: import-app
-import-app: wallet ## Import the Apex App. Specify ID=<app_id>
-	. $(ENV_FILE); \
+import-app: wallet ## Import the Apex App. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
+ifndef ID
+	@echo ID is not set
+	@exit 1
+endif
+ifndef NEWID
+	$(eval NEWID := $(ID))
+endif
+	@. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
 	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/apex_install_overrides.sql "$${WORKSPACE_NAME}" "$${SCHEMA}" $(ID) $(NEWID) "apps/f$(ID).sql" EOF; \
 
@@ -113,10 +124,10 @@ update-schema: wallet ## Apply the Change Log to the schema
 	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/apply_changelog.sql EOF
 
 .PHONY: snapshot
-snapshot: changelog export-app ## Create a new change Log, and export the app. Specify ID=<app_id>
+snapshot: export-app changelog ## Create a new change Log, and export the app. Specify ID=<app_id>
 
 .PHONY: update
-update: update-schema import-app ## Apply the Change Log to the schema and import the app. Specify ID=<app_id> NEWID=<new_app_id>
+update: import-app update-schema ## Apply the Change Log & import the app. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
 
 .PHONY: init
 init: tf-apply ## Deploy the database(s) and setup all the defined environments

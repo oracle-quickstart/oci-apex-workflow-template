@@ -11,6 +11,8 @@ BEGIN
     apex_application_install.set_application_id(p_application_id => &4);
     apex_application_install.set_application_alias( 'F&3' );
     apex_application_install.generate_offset();
+    apex_application_install.SET_BUILD_STATUS(p_build_status => 'RUN_AND_BUILD');
+    apex_application_install.set_auto_install_sup_obj( p_auto_install_sup_obj => true );
 END;
 /
 @&5
