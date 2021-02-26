@@ -6,6 +6,7 @@ resource "random_password" "admin_password" {
     min_upper        = 1
     min_lower        = 1
     min_numeric      = 1 
+    override_special = "#"
 }
 
 resource "random_password" "apex_admin_password" {
@@ -16,6 +17,7 @@ resource "random_password" "apex_admin_password" {
     min_upper        = 1
     min_lower        = 1
     min_numeric      = 1 
+    override_special = "#"
 }
 
 resource "random_password" "schema_password" {
@@ -26,6 +28,7 @@ resource "random_password" "schema_password" {
     min_upper        = 1
     min_lower        = 1
     min_numeric      = 1 
+    override_special = "#"
 }
 
 resource "random_password" "ws_password" {
@@ -36,6 +39,7 @@ resource "random_password" "ws_password" {
     min_upper        = 1
     min_lower        = 1
     min_numeric      = 1 
+    override_special = "#"
 }
 
 resource "random_password" "ws_admin_password" {
@@ -46,4 +50,5 @@ resource "random_password" "ws_admin_password" {
     min_upper        = 1
     min_lower        = 1
     min_numeric      = 1 
+    override_special = "#"
 }

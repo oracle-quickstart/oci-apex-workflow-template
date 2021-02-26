@@ -1,8 +1,6 @@
-
-
+# Apex CI-CD workflow template
 
 ## **Reference Architecture**
-
 
 ![alt text](./images/apexcicd.png)
 
@@ -19,18 +17,15 @@
 </copy>  
 ```
 
-2. Install SQLCL in your local desktop or in OCI Compute Instance. You can download from [here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
+2. Download SQLcl from [here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
 
-```
-<copy>
-cd ~
-unzip -oq /tmp/<sqlcl archive>
-export JAVA_HOME=${HOME}/java/<jdk version>
-alias sql="${HOME}/sqlcl/bin/sql"
-</copy>
-```
+3. Place the SQLcl download in the scripts folder
 
-## **Development Environment Setup**:
+4. run:
+
+  ```bash
+  ./script/setup_env.sh
+  ```
 
 ## **STEP 1:** Terraform setup
 

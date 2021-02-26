@@ -130,6 +130,6 @@ snapshot: export-app changelog ## Create a new change Log, and export the app. S
 update: import-app update-schema ## Apply the Change Log & import the app. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
 
 .PHONY: init
-init: tf-apply ## Deploy the database(s) and setup all the defined environments
+init: clean-wallets tf-apply ## Deploy the database(s) and setup all the defined environments
 	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-apex-admin ENV={}
 	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-ws ENV={}
