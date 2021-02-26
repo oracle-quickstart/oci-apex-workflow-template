@@ -181,6 +181,7 @@
   update-schema                  Apply the Change Log to the schema
   snapshot                       Create a new change Log, and export the app. Specify ID=<app_id>
   update                         Apply the Change Log & import the app. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
+  rollback                       Rollback changes. Specify ID=<app_id> NEWID=<new_app_id>
   init                           Deploy the database(s) and setup all the defined environments
   test                           Test (WIP)
   ```
@@ -281,23 +282,35 @@
   git push origin master
   ```
 
-2. Back on the APEX_DEV database, make some changes:
+2. To facilitate rollback, create a release branch
+
+  ```bash
+  git branch release/v1.0.0
+  ```
+
+3. Back on the APEX_DEV database, make some changes:
 
   For example, add a table, or add a column in an existing table, or modify a component of the application
 
-3. Create a new snapshot:
+4. Create a new snapshot:
 
   ```bash
   make snapshot ID=<app_id>
   ```
 
-4. Check your changes into git
+5. Check your changes into git
 
   ```bash
   git add apps/
   git add changelogs/
   git commit -m"First state change"
   git push origin master
+  ```
+
+6. Create a new release branch
+
+  ```bash
+  git branch release/v1.0.1
   ```
 
 5. Redeploy to prod
@@ -310,6 +323,21 @@
 
 ## **STEP 10:** Rolling back changes
 
+1. Rolling back consists in going back to a previous state. Using our release branches it's easy to rollback to a given version
+
+2. Checkout the release branch to roll back to
+
+  ```bash
+  git checkout release/v1.0.0
+  ```
+
+3. Apply the rollback
+
+  ```bash
+  make rollback ENV=prd ID=<app_id>
+  ```
+
+4. 
 
 ## **STEP 11:** Create an additional environment
 

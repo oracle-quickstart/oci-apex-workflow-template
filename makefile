@@ -130,11 +130,20 @@ update-schema: wallet ## Apply the Change Log to the schema
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
 	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/apply_changelog.sql EOF
 
+.PHONY: rollback-schema
+rollback-schema: wallet ## Rollback all Change Logs
+	. $(ENV_FILE); \
+	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
+	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/rollback.sql EOF
+
 .PHONY: snapshot
 snapshot: export-app changelog ## Create a new change Log, and export the app. Specify ID=<app_id>
 
 .PHONY: update
 update: import-app update-schema ## Apply the Change Log & import the app. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
+
+.PHONY: rollback
+rollback: import-app rollback-schema ## Rollback changes. Specify ID=<app_id> NEWID=<new_app_id>
 
 .PHONY: init
 init: clean-wallets tf-apply ## Deploy the database(s) and setup all the defined environments
