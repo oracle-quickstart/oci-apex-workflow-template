@@ -24,6 +24,14 @@ sql: ## SQLcl shell as APEX ADMIN user
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
 	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} 
 
+.PHONY: sql-schema
+sql-schema: ## SQLcl shell as SCHEMA user
+	. $(ENV_FILE); \
+	echo $$APEX_ADMIN_EMAIL; \
+	echo $$WALLET_FILE; \
+	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
+	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} 
+
 .PHONY: wallet
 wallet: ## Get the Database wallet
 	@ . $(ENV_FILE); \
