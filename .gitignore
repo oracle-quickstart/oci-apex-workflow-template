@@ -7,3 +7,4 @@ terraform/*.tfstate.lock.info
 sqlcl
 *-wallet.zip
 *.env
+sqlcl*.zip
