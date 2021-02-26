@@ -15,10 +15,6 @@ help: ## This help.
 
 .DEFAULT_GOAL := help
 
-.PHONY: install-deps
-install-deps: ## Install required dependencies
-	./scripts/setup_env.sh
-
 .PHONY: sql
 sql: ## SQLcl shell as APEX ADMIN user
 	. $(ENV_FILE); \
@@ -43,7 +39,7 @@ wallet: ## Get the Database wallet
 
 .PHONY: clean-wallets 
 clean-wallets: ## remove the wallets
-	rm *-wallet.zip
+	@find . -type f -iname \*-wallet.zip -exec rm {} \;
 
 .PHONY: tf-apply
 tf-apply: ## Run the terraform stack

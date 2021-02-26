@@ -6,7 +6,9 @@
 
 ### ***Prerequisites***
 
-1. JDK: Download from [here](https://www.oracle.com/java/technologies/javase-downloads.html)
+1. JDK: Download from [https://www.oracle.com/java/technologies/javase-downloads.html](https://www.oracle.com/java/technologies/javase-downloads.html)
+
+2. OCI CLI installed and configured (see [https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm))
 
 ## **STEP 1:** Get the template and required downloads
 
@@ -14,14 +16,18 @@
 
   ![](./images/template.png)
 
-2. Download SQLcl from [here](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
+  Enter a repository name of your choice.
 
-3. Place the SQLcl download in the root folder
+2. Clone your new repository (not this repo) locally.
 
-4. run:
+3. Download SQLcl from [https://www.oracle.com/tools/downloads/sqlcl-downloads.html](https://www.oracle.com/tools/downloads/sqlcl-downloads.html)
+
+4. Place the SQLcl zip file download in the root folder of the project
+
+5. To setup SQLcl, run:
 
   ```bash
-  ./script/setup_env.sh
+  ./setup_env.sh
   ```
 
 ## **STEP 2:** Terraform setup
@@ -48,6 +54,8 @@
   export TF_VAR_region=us-ashburn-1
   ```
 
+  These values come from your OCI CLI installation
+
 4. Create a `terraform.tfvars` file from template
 
   ```bash
@@ -64,8 +72,69 @@
   and edit the schema, workspace and user names as desired. The defaults look like:
 
   ```
+  databases=[
+      {
+          "db_name" = "apexdev"
+          "display_name" = "APEX_DEV"
+          "cpu_core_count" = 1
+          "storage_size_in_tbs" = 1
+          "db_version" = "19c"
+          "db_workload" = "OLTP"
+          "is_free_tier" = true
+          "license_model" = "LICENSE_INCLUDED"
+          "envs" = ["dev", "stg", "tst"]
+      },
+      {
+          "db_name" = "apexprd"
+          "display_name" = "APEX_PRD"
+          "cpu_core_count" = 2
+          "storage_size_in_tbs" = 2
+          "db_version" = "19c"
+          "db_workload" = "OLTP"
+          "is_free_tier" = false
+          "license_model" = "LICENSE_INCLUDED"
+          "envs" = ["prd"]
+      }
+  ]
 
+  environments = {
+      "dev" = {
+          workspace_name = "WS"
+          schema_name = "MYAPP"
+          workspace_admin = "WS_ADMIN"
+          apex_admin_email = "admin@local"
+          ws_admin_email = "admin@local"
+      },
+      # if environments are on the same DB, 
+      # the schema and workspace need a different name
+      "stg" = {
+          workspace_name = "WS_STG"
+          schema_name = "MYAPP_STG"
+          workspace_admin = "WS_ADMIN_STG"
+          apex_admin_email = "admin@local"
+          ws_admin_email = "admin@local"
+      }
+      "tst" = {
+          workspace_name = "WS_TST"
+          schema_name = "MYAPP_TST"
+          workspace_admin = "WS_ADMIN_TST"
+          apex_admin_email = "admin@local"
+          ws_admin_email = "admin@local"
+      }
+      # on separate database, use the same name for schema and workspace
+      "prd" = {        
+          workspace_name = "WS"
+          schema_name = "MYAPP"
+          workspace_admin = "WS_ADMIN"
+          apex_admin_email = "admin@local"
+          ws_admin_email = "admin@local"
+      }
+  }
   ```
+
+  This creates 2 databases, and 4 environments: dev, tst, and stg are on the APEX_DEV database and prd is on the APEX_PRD database
+
+  Feel free to configure these are you need, however make sure that SCHEMA, WORKSPACE and WS_ADMIN names are different if setting up multipl environment in the same database.
 
 ## **STEP 3:** Deploy
 
@@ -75,8 +144,11 @@
   make init
   ```
   
-  The terraform stacks generates environment files for each environment. The files are on the root folder, named *`<env_name>.env`* and contain the credentials for each user/schema/workspace
+  Type `yes` at the prompt to confirm applying the terraform stack.
 
+  The terraform stacks generates environment files for each environment. The files are on the root folder, named *`<env_name>.env`* and they contain the credentials for user/schema/workspace for each environment.
+
+  The script sets up all of the environments for you, ready to install a new app.
 
 ## **STEP 4:** Using the makefile
 
@@ -90,28 +162,35 @@
 
   ```bash
   help                           This help.
-  install-deps                   Install required dependencies
-  sql                            SQLcl shell as APEX ADMIN user
+  sql                            SQLcl shell as SCHEMA user
   wallet                         Get the Database wallet
+  clean-wallets                  remove the wallets
   tf-apply                       Run the terraform stack
   tf-destroy                     Destroy the terraform stack
-  create-apex-admin              Create the APEX admin user
-  delete-apex-admin              Delete the APEX admin user
   create-cloud-creds             Create default cloud credential for the APEX ADMIN user to use datapump to Object Storage 
   create-schema                  Create schema
   delete-schema                  Delete schema
   create-ws                      Create schema, workspace, add schema to workspace and create workspace admin user
   delete-ws                      Delete workspace and its users
   export-app                     Export the Apex App. Specify ID=<app_id>
-  import-app                     Import the Apex App. Specify ID=<app_id>
+  import-app                     Import the Apex App. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
   changelog                      Generate a new Change Log for the schema
   update-schema                  Apply the Change Log to the schema
   snapshot                       Create a new change Log, and export the app. Specify ID=<app_id>
-  update                         Apply the Change Log to the schema and import the app. Specify ID=<app_id> NEWID=<new_app_id>
-  init                           Deploy the database(s) and setup all the defined environments  
+  update                         Apply the Change Log & import the app. Specify ID=<app_id> NEWID=<new_app_id> (defaults to ID)
+  init                           Deploy the database(s) and setup all the defined environments
+  test                           Test (WIP)
   ```
 
-2. Oracle Autonomous Database has `admin` user by default which has all the special privileges to run as a administrator ,  for the purpose of APEX workspace provisioning and management we will be creating `apexadmin` user. 
+  Many of these functions are sub-function of the main functions describes here, giving you more granularity to manipulate specific objects.
+
+  The main commands we will use are:
+
+  - `init`: initiallize the whole environment (`tf-apply` + `wallet` + `create-schema` + `create-ws` applied to each environment)
+  - `snapshot ID=\<app_id\>`: to take a snapshot of the state of the application (`changelog` + `export-app`)
+  - `update ID=\<app_id\>`: to update the app (`update-schema` + `import-app`)
+
+  The other commands can be used to create additional environments (`create-schema`, `create-ws`) and manually perform specific task (`wallet`,`clean-wallets` to get and clean an environment DB wallet) 
 
 ## **STEP 5:** Start developping
 
@@ -190,7 +269,7 @@
 
 ## **STEP 9:** Make some changes
 
-1. Before making any changes, checkin you current state into git:
+1. Before making any changes, check you current state into git:
 
   ```bash
   git add apps/
@@ -224,89 +303,29 @@
   make update ENV=prd ID=<app_id>
   ```
 
+6. On the APEX_PRD DB, check that the changes have propagated.
+
 ## **STEP 10:** Rolling back changes
 
 
+## **STEP 11:** Create an additional environment
 
-
-## **STEP 8:** Create other environments
-
-1. The `make` commands above take a variable *`ENV`* that define what `.env` file to use to create the environment. To create another environment, duplicate one of the `.env` file and rename it.
+1. The `make` commands above take a variable *`ENV`* that define what `.env` file to use to create the environment. To create another environment, duplicate one of the `.env` file for the DB you want to use and rename it.
 
   *If you use the same target database, you MUST change the name of the SCHEMA and the WORKSPACE in the new `.env` file*
 
-2. Get the wallet for the DB for this other environment:
+2. Get the wallet for the DB for this new environment:
 
   ```bash
-  make wallet ENV=prod
+  make wallet ENV=newprod
   ```
 
-  (prod being the basename of the .env file to use: `prod.env`)
+  (newprod being the basename of the .env file to use: `newprod.env`)
 
 3. Then you can create the schema and workspace for the new environment using:
 
   ```bash
-  make create-ws ENV=prod
+  make create-ws ENV=newprod
   ```
 
   *If you use a separate database, it is recommended to use the same SCHEMA and WORKSPACE names, but change the passwords*
-
-  *You also need to create the APEX admin user in the new database* with:
-
-  ```bash
-  make create-apex-admin ENV=prod
-  ```
-
-
-2. Export files are written into `DATA_PUMP_DIR` by default and in a Autonomous database you can access it by
-```
-<copy>
-  select object_name, bytes
-  from dbms_cloud.list_files('DATA_PUMP_DIR') WHERE object_name like '%dmp%`
-
- </copy>
- ```
-
-### **STEP 5**: Prepare to export apex application
-  You can enter the application id of the APEX application when generating
-
-  ```
- <copy>
- $ cd <directory where you want to store the apex file>
- $sql /nolog
- SQL> set cloudconfig  <wallet downloaded directory>/<wallet zip file>
- SQL> conn workshop/<password>@<service name>
- SQL>  lb genobject -type apex -applicationid <application id>
- </copy>
- ```
-Download the SQLCL from https://www.oracle.com/tools/downloads/sqlcl-downloads.html (https://download.oracle.com/otn/java/sqldeveloper/sqlcl-20.4.1.351.1718.zip)
-
-
-```
-scp -i ~/.ssh/sqlcl sqlcl-20.4.1.351.1718.zip opc@129.213.145.126:/tmp
-
-cd ~
-unzip -q /tmp/sqlcl-20.4.1.351.1718.zip
-export JAVA_HOME=${HOME}/java/
-alias sql="${HOME}/sqlcl/bin/sql"
-
-```
-
-
-
-Login to the APEX Workspace as *WORKSP_ADMIN* with  default password *WELcome##12345* , Import the Opportunity Tracker application and Unlock the application
-
-![alt text](./images/opportunity_tracker.png)
-
-Once Installed unlock the application to make modification
-![alt text](./images/unlock.png)
-
-
-
-### **Steps for Rollback changes to the application **:
-
-if you want to rollback the changes, write a custom script or use SQLCL rollback command to rollback number of changes or by date
-
-```
-lb rollbacksql -changelog controller.xml -count 1
-```

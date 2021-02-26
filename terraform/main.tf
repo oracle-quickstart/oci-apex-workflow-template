@@ -9,7 +9,7 @@ resource "oci_database_autonomous_database" "atp" {
     db_name = var.databases[count.index].db_name
 
     #Optional
-    admin_password = random_password.admin_password[count.index].result
+    admin_password = "P${random_password.admin_password[count.index].result}"
     data_storage_size_in_tbs = var.databases[count.index].storage_size_in_tbs
     db_version = var.databases[count.index].db_version
     db_workload = var.databases[count.index].db_workload
