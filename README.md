@@ -162,11 +162,14 @@
 
   ```bash
   help                           This help.
-  sql                            SQLcl shell as SCHEMA user
+  sql                            SQLcl shell as APEX ADMIN user
+  sql-schema                     SQLcl shell as SCHEMA user
   wallet                         Get the Database wallet
   clean-wallets                  remove the wallets
   tf-apply                       Run the terraform stack
   tf-destroy                     Destroy the terraform stack
+  create-apex-admin              Create the APEX admin user
+  delete-apex-admin              Delete the APEX admin user
   create-cloud-creds             Create default cloud credential for the APEX ADMIN user to use datapump to Object Storage 
   create-schema                  Create schema
   delete-schema                  Delete schema
