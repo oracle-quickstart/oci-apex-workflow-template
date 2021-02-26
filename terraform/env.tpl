@@ -12,12 +12,6 @@ DB_SERVICE=$${DB_NAME}_tp
 DB_ADMIN_USER=admin
 DB_ADMIN_PWD="P${admin_password}"
 
-# APEX Admin User
-APEX_ADMIN_USER=apexadmin
-APEX_ADMIN_PWD="P${apex_admin_password}"
-APEX_ADMIN_EMAIL=${apex_admin_email}
-APEX_ADMIN_TOKEN=""
-
 # Schema
 SCHEMA=${schema_name}
 SCHEMA_ADMIN_PWD="P${schema_password}"

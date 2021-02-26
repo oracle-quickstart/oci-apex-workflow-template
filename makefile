@@ -20,15 +20,7 @@ install-deps: ## Install required dependencies
 	./scripts/setup_env.sh
 
 .PHONY: sql
-sql: ## SQLcl shell as APEX ADMIN user
-	. $(ENV_FILE); \
-	echo $$APEX_ADMIN_EMAIL; \
-	echo $$WALLET_FILE; \
-	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} 
-
-.PHONY: sql-schema
-sql-schema: ## SQLcl shell as SCHEMA user
+sql: ## SQLcl shell as SCHEMA user
 	. $(ENV_FILE); \
 	echo $$APEX_ADMIN_EMAIL; \
 	echo $$WALLET_FILE; \
@@ -58,18 +50,6 @@ tf-destroy: clean-wallets ## Destroy the terraform stack
 	. TF_VARS.sh; \
 	terraform destroy
 
-.PHONY: create-apex-admin
-create-apex-admin: wallet ## Create the APEX admin user
-	. $(ENV_FILE); \
-	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/create_apex_admin.sql "$${APEX_ADMIN_USER}" "$${APEX_ADMIN_PWD}" EOF
-
-.PHONY: delete-apex-admin
-delete-apex-admin: wallet ## Delete the APEX admin user
-	. $(ENV_FILE); \
-	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/remove_apex_admin.sql "$${APEX_ADMIN_USER}" EOF
-
 .PHONY: create-cloud-creds
 create-cloud-creds: wallet ## Create default cloud credential for the APEX ADMIN user to use datapump to Object Storage 
 	. $(ENV_FILE); \
@@ -80,25 +60,25 @@ create-cloud-creds: wallet ## Create default cloud credential for the APEX ADMIN
 create-schema: wallet ## Create schema
 	. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/create_schema.sql "$${SCHEMA}" "$${SCHEMA_ADMIN_PWD}" EOF
+	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/create_schema.sql "$${SCHEMA}" "$${SCHEMA_ADMIN_PWD}" EOF
 
 .PHONY: delete-schema
 delete-schema: wallet ## Delete schema
 	. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/remove_schema.sql "$${SCHEMA}" EOF
+	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/remove_schema.sql "$${SCHEMA}" EOF
 
 .PHONY: create-ws
 create-ws: create-schema ## Create schema, workspace, add schema to workspace and create workspace admin user
 	. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/create_workspace.sql "$${SCHEMA}" "$${APEX_ADMIN_USER}" "$${WORKSPACE_ADMIN}" "$${WORKSPACE_ADMIN_PWD}" "$${WORKSPACE_ADMIN_EMAIL}" "$${WORKSPACE_NAME}" EOF
+	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/create_workspace.sql "$${SCHEMA}" "$${APEX_ADMIN_USER}" "$${WORKSPACE_ADMIN}" "$${WORKSPACE_ADMIN_PWD}" "$${WORKSPACE_ADMIN_EMAIL}" "$${WORKSPACE_NAME}" EOF
 
 .PHONY: delete-ws
 delete-ws: wallet ## Delete workspace and its users
 	. $(ENV_FILE); \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig $${WALLET_FILE} $${APEX_ADMIN_USER}/$${APEX_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/remove_workspace.sql "$${WORKSPACE_NAME}" "$${WORKSPACE_ADMIN}" EOF
+	sql -cloudconfig $${WALLET_FILE} $${DB_ADMIN_USER}/$${DB_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/admin/remove_workspace.sql "$${WORKSPACE_NAME}" "$${WORKSPACE_ADMIN}" EOF
 
 .PHONY: export-app
 export-app: wallet ## Export the Apex App. Specify ID=<app_id>
@@ -142,7 +122,6 @@ update: import-app update-schema ## Apply the Change Log & import the app. Speci
 
 .PHONY: init
 init: clean-wallets tf-apply ## Deploy the database(s) and setup all the defined environments
-	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-apex-admin ENV={}
 	find . -type f -iname \*.env | awk -F"." '{print $$2}' | tr -d "/" | xargs -I{} make create-ws ENV={}
 
 .PHONY: test

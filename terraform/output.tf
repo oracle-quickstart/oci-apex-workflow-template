@@ -15,14 +15,12 @@ resource "local_file" "env" {
         db_name = oci_database_autonomous_database.atp[local.db_idx_map[count.index]].db_name
         db_ocid = oci_database_autonomous_database.atp[local.db_idx_map[count.index]].id
         admin_password = random_password.admin_password[local.db_idx_map[count.index]].result
-        apex_admin_password = random_password.apex_admin_password[local.db_idx_map[count.index]].result
-        apex_admin_email = var.environments[local.all_envs[count.index]].apex_admin_email
         schema_name = var.environments[local.all_envs[count.index]].schema_name
         schema_password = random_password.schema_password[count.index].result
+        workspace_name = var.environments[local.all_envs[count.index]].workspace_name
+        ws_password = random_password.ws_password[count.index].result
         ws_admin = var.environments[local.all_envs[count.index]].workspace_admin
         ws_admin_password = random_password.ws_admin_password[count.index].result
         ws_admin_email = var.environments[local.all_envs[count.index]].ws_admin_email
-        workspace_name = var.environments[local.all_envs[count.index]].workspace_name
-        ws_password = random_password.ws_password[count.index].result
     })
 }
