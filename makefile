@@ -124,6 +124,13 @@ changelog: wallet ## Generate a new Change Log for the schema
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
 	sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/gen_schema.sql EOF
 
+.PHONY: data-change
+data-change: wallet ## Generate a change log for data in tables listed in tables.txt
+	. $(ENV_FILE); \
+	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
+	export TABLES=`cat tables.txt | tr "\n" ","`; \
+	if [[ "$${TABLES}" != "" ]]; then sql -cloudconfig $${WALLET_FILE} $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} << EOF @./scripts/sql/change_tracking/gen_data_change.sql $${TABLES} EOF; fi
+
 .PHONY: update-schema
 update-schema: wallet ## Apply the Change Log to the schema
 	. $(ENV_FILE); \
