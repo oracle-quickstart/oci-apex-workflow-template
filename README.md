@@ -253,6 +253,7 @@
 
   ```bash
   git branch release/v1.0.0
+  git push origin release/v1.0.0
   ```
 
 ## **STEP 7:** Deploy the app to another environment
@@ -311,6 +312,7 @@
 
   ```bash
   git branch release/v1.0.1
+  git push origin release/v1.0.1
   ```
 
 5. Redeploy to prod
