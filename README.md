@@ -240,6 +240,21 @@
   make export-app ID=<app_id>
   ```
 
+3. check you current state into git:
+
+  ```bash
+  git add apps/
+  git add changelogs/
+  git commit -m"Initial state"
+  git push origin master
+  ```
+
+4. To facilitate rollback, create a release branch
+
+  ```bash
+  git branch release/v1.0.0
+  ```
+
 ## **STEP 7:** Deploy the app to another environment
 
 1. With the app export and the schema changelog, we can reproduce the full application to another environment with:
@@ -273,32 +288,17 @@
 
 ## **STEP 9:** Make some changes
 
-1. Before making any changes, check you current state into git:
-
-  ```bash
-  git add apps/
-  git add changelogs/
-  git commit -m"Initial state"
-  git push origin master
-  ```
-
-2. To facilitate rollback, create a release branch
-
-  ```bash
-  git branch release/v1.0.0
-  ```
-
-3. Back on the APEX_DEV database, make some changes:
+1. Back on the APEX_DEV database, make some changes:
 
   For example, add a table, or add a column in an existing table, or modify a component of the application
 
-4. Create a new snapshot:
+2. Create a new snapshot:
 
   ```bash
   make snapshot ID=<app_id>
   ```
 
-5. Check your changes into git
+3. Check your changes into git
 
   ```bash
   git add apps/
@@ -307,7 +307,7 @@
   git push origin master
   ```
 
-6. Create a new release branch
+4. Create a new release branch
 
   ```bash
   git branch release/v1.0.1
