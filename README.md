@@ -69,7 +69,7 @@
   compartment_id="ocid1.compartment.oc1.."
   ```
 
-  and edit the schema, workspace and user names as desired. The defaults look like:
+  and edit the schema, workspace and user names as desired. The default looks like:
 
   ```
   databases=[
@@ -132,9 +132,9 @@
   }
   ```
 
-  This creates 2 databases, and 4 environments: dev, tst, and stg are on the APEX_DEV database and prd is on the APEX_PRD database
+  This creates 2 databases (`APEX_DEV` and `APEX_PRD`), and 4 environments (`dev`, `tst`, `stg`, `prd`): `dev`, `tst`, and `stg` are on the `APEX_DEV` database and `prd` is on the `APEX_PRD` database
 
-  Feel free to configure these are you need, however make sure that SCHEMA, WORKSPACE and WS_ADMIN names are different if setting up multipl environment in the same database.
+  Feel free to configure these as you need, however make sure that SCHEMA, WORKSPACE and WS_ADMIN names are different if setting up multiple environments in the same database.
 
 ## **STEP 3:** Deploy
 
@@ -186,15 +186,15 @@
   test                           Test (WIP)
   ```
 
-  Many of these functions are sub-function of the main functions describes here, giving you more granularity to manipulate specific objects.
+  Many of these functions are sub-functions of the main functions describes here, giving you more granularity to manipulate specific objects.
 
   The main commands we will use are:
 
-  - `init`: initiallize the whole environment (`tf-apply` + `wallet` + `create-schema` + `create-ws` applied to each environment)
+  - `init`: initialize the whole environment (`tf-apply` + `wallet` + `create-schema` + `create-ws` applied to each environment)
   - `snapshot ID=\<app_id\>`: to take a snapshot of the state of the application (`changelog` + `export-app`)
   - `update ID=\<app_id\>`: to update the app (`update-schema` + `import-app`)
 
-  The other commands can be used to create additional environments (`create-schema`, `create-ws`) and manually perform specific task (`wallet`,`clean-wallets` to get and clean an environment DB wallet) 
+  The other commands can be used to create additional environments (`create-schema`, `create-ws`) and manually perform specific task (`wallet`,`clean-wallets` to get and clean environment DB wallets) 
 
 ## **STEP 5:** Start developping
 
