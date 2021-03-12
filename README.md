@@ -2,7 +2,7 @@
 
 ## **Reference Architecture**
 
-![alt text](./images/apexcicd.png)
+![](./images/apex-wf.png)
 
 ### ***Prerequisites***
 
