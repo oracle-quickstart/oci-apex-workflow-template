@@ -4,13 +4,63 @@
 variable "region" {}
 variable "compartment_id" {}
 variable "databases" {
-    default = []
+    default = [
+        {
+            "db_name" = "apexdev"
+            "display_name" = "APEX_DEV"
+            "cpu_core_count" = 1
+            "storage_size_in_tbs" = 1
+            "db_version" = "19c"
+            "db_workload" = "OLTP"
+            "is_free_tier" = true
+            "license_model" = "LICENSE_INCLUDED"
+            "envs" = ["dev", "stg", "tst"]
+        },
+        {
+            "db_name" = "apexprd"
+            "display_name" = "APEX_PRD"
+            "cpu_core_count" = 1
+            "storage_size_in_tbs" = 1
+            "db_version" = "19c"
+            "db_workload" = "OLTP"
+            "is_free_tier" = true
+            "license_model" = "LICENSE_INCLUDED"
+            "envs" = ["prd"]
+        }
+    ]
 }
 variable "environments" { 
     default = {
         "dev" = {
             workspace_name = "WS"
             schema_name = "MYAPP"
+            workspace_admin = "WS_ADMIN"
+            apex_admin_email = "admin@local"
+            ws_admin_email = "admin@local"
+        },
+        # if environments are on the same DB, 
+        # the schema and workspace need a different name
+        "stg" = {
+            workspace_name = "WS_STG"
+            schema_name = "MYAPP_STG"
+            workspace_admin = "WS_ADMIN_STG"
+            apex_admin_email = "admin@local"
+            ws_admin_email = "admin@local"
+        }
+        "tst" = {
+            workspace_name = "WS_TST"
+            schema_name = "MYAPP_TST"
+            workspace_admin = "WS_ADMIN_TST"
+            apex_admin_email = "admin@local"
+            ws_admin_email = "admin@local"
+        }
+        # on separate database, use the same name for schema and workspace
+        "prd" = {        
+            workspace_name = "WS"
+            schema_name = "MYAPP"
+            workspace_admin = "WS_ADMIN"
+            apex_admin_email = "admin@local"
+            ws_admin_email = "admin@local"
         }
     }
 }
