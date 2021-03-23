@@ -71,7 +71,7 @@
 
   and edit the schema, workspace and user names as desired. The default looks like:
 
-  ```
+  ```  
   databases=[
       {
           "db_name" = "apexdev"
@@ -87,11 +87,11 @@
       {
           "db_name" = "apexprd"
           "display_name" = "APEX_PRD"
-          "cpu_core_count" = 2
-          "storage_size_in_tbs" = 2
+          "cpu_core_count" = 1
+          "storage_size_in_tbs" = 1
           "db_version" = "19c"
           "db_workload" = "OLTP"
-          "is_free_tier" = false
+          "is_free_tier" = true
           "license_model" = "LICENSE_INCLUDED"
           "envs" = ["prd"]
       }

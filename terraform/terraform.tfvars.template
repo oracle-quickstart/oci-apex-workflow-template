@@ -4,6 +4,7 @@
 region="us-ashburn-1"
 compartment_id="ocid1.compartment.oc1....."
 
+
 databases=[
     {
         "db_name" = "apexdev"
@@ -19,11 +20,11 @@ databases=[
     {
         "db_name" = "apexprd"
         "display_name" = "APEX_PRD"
-        "cpu_core_count" = 2
-        "storage_size_in_tbs" = 2
+        "cpu_core_count" = 1
+        "storage_size_in_tbs" = 1
         "db_version" = "19c"
         "db_workload" = "OLTP"
-        "is_free_tier" = false
+        "is_free_tier" = true
         "license_model" = "LICENSE_INCLUDED"
         "envs" = ["prd"]
     }
