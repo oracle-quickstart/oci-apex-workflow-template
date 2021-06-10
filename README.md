@@ -414,3 +414,9 @@
   ```
 
   *If you use a separate database, it is recommended to use the same SCHEMA and WORKSPACE names, but change the passwords*
+
+## References
+
+This code is used in the following solutions and labs:
+
+- [LiveLab](https://apexapps.oracle.com/pls/apex/dbpm/r/livelabs/view-workshop?wid=799&clear=180&session=113472219650771)
