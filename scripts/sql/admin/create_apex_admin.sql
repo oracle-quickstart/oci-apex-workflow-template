@@ -10,7 +10,7 @@ begin
 		execute immediate 'grant resource to '||l_user;
 		execute immediate 'grant dwrole to '||l_user;
 		execute immediate 'grant create session to '||l_user;
-		execute immediate 'grant APEX_ADMINISTRATOR_READ_ROLE to '||l_user;
+		execute immediate 'grant APEX_ADMINISTRATOR_ROLE to '||l_user;
 		execute immediate 'grant create user, drop user, alter user to '||l_user;
 		execute immediate 'grant ADPUSER to '||l_user;
 		execute immediate 'grant CONNECT to '||l_user;
@@ -26,7 +26,6 @@ begin
 		execute immediate 'grant XS_NAMESPACE_ADMIN to '||l_user;
 		execute immediate 'grant XS_SESSION_ADMIN to '||l_user;
 		execute immediate 'grant select on sys.dba_sys_privs to '||l_user;
-		execute immediate 'grant execute on apex_instance_admin to '||l_user;
 		execute immediate 'grant create user, drop user, alter user to '||l_user;
 		execute immediate 'grant create user, drop user, alter user to '||l_user;
 		execute immediate 'grant datapump_cloud_exp to '||l_user;
