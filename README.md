@@ -1,5 +1,15 @@
 # Apex CI-CD workflow template
 
+## Disclaimer
+
+**There was an issue with SQLcl v22.1.1 that caused changelogs not to be recorded properly, so that table changelogs created with that version would get DELETED when rolling back a change.**
+
+**This bug was fixed in SQLcl v22.2, HOWEVER, upgrading alone is not sufficient to fix the problem.**
+
+**If SQLcl 22.1.1 was ever used, the bad data will persist in the change logs, with the potential of tables being deleted in the future when rolling back a change to the table(s) affected.**
+
+**There is no simple fix, as the data is effectively missing. We highly recommend that if you ever used v22.1.1, you clear your change logs and start fresh. This will delete the history of past changes (so be sure to be at a stage where you won't need to go back) but will prevent future issues.**
+
 ## **Reference Architecture**
 
 ![](./images/apex-wf.png)
