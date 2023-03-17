@@ -8,3 +8,4 @@ sqlcl
 *-wallet.zip
 *.env
 sqlcl*.zip
+.terraform.lock.hcl

@@ -24,7 +24,7 @@ databases=[
         "storage_size_in_tbs" = 1
         "db_version" = "19c"
         "db_workload" = "OLTP"
-        "is_free_tier" = true
+        "is_free_tier" = false
         "license_model" = "LICENSE_INCLUDED"
         "envs" = ["prd"]
     }

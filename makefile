@@ -130,11 +130,20 @@ endif
 	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/apex_install_overrides.sql "$${WORKSPACE_NAME}" "$${SCHEMA}" $(ID) $(NEWID) "apps/f$(ID).sql" \
 	EOF
 
+# .PHONY: generate-schema
+# generate-schema: wallet ## Generate initial schema
+# 	. ./$(ENV_FILE); \
+# 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
+# 	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/gen_schema.sql \
+# 	EOF
+
 .PHONY: changelog
-changelog: wallet ## Generate a new Change Log for the schema
+changelog: wallet increment-tag ## Generate a new Change Log for the schema
 	. ./$(ENV_FILE); \
+	. ./changelogs/tag.txt; \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/gen_schema.sql \
+	echo TAG=$${TAG}; \
+	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/gen_schema.sql "$${TAG}" \
 	EOF
 
 .PHONY: update-schema
@@ -145,11 +154,18 @@ update-schema: wallet ## Apply the Change Log to the schema
 	EOF
 
 .PHONY: rollback-schema
-rollback-schema: wallet ## Rollback all Change Logs
+rollback-schema: wallet ## Rollback schema to current tag
 	. ./$(ENV_FILE); \
+	. ./changelogs/tag.txt; \
 	export PATH=$$PATH:$(PWD)/sqlcl/bin/; \
-	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/rollback.sql \
+	sql -cloudconfig ./$(ENV)-wallet.zip $${SCHEMA}/$${SCHEMA_ADMIN_PWD}@$${DB_SERVICE} <<- EOF @./scripts/sql/change_tracking/rollback.sql "$${TAG}"\
 	EOF
+
+.PHONY: increment-tag
+increment-tag: 
+	. ./changelogs/tag.txt; \
+	export TAG=$$(( $${TAG:=0} + 1 )); \
+	echo "TAG=$${TAG}" > ./changelogs/tag.txt
 
 .PHONY: snapshot
 snapshot: export-app changelog ## Create a new change Log, and export the app. Specify ID=<app_id>

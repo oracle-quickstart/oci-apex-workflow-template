@@ -2,4 +2,5 @@
 -- All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 cd changelogs;
-lb genschema -grants;
+lb generate-schema -grants;
+lb tag -tag &1 ;

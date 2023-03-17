@@ -2,4 +2,4 @@
 -- All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 cd changelogs;
-lb rollback -emit_schema -changelog controller.xml -count 999 
+lb rollback -changelog-file controller.xml -tag &1;
