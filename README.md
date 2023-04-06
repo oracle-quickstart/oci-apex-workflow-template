@@ -2,6 +2,8 @@
 
 ## Disclaimer
 
+**The latest SQLcl API changed to a point that this flow does not work anymore, so this repo is being archived. If you used this repo, do not upgrade to version later than 22.2**
+
 **There was an issue with SQLcl v22.1.1 that caused changelogs not to be recorded properly, so that table changelogs created with that version would get DELETED when rolling back a change.**
 
 **This bug was fixed in SQLcl v22.2, HOWEVER, upgrading alone is not sufficient to fix the problem.**
